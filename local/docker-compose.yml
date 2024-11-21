@@ -1,0 +1,14 @@
+services:
+  mongodb:
+    image: mongo
+    ports:
+      - 27017:27017
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admim
+      - MONGO_INITDB_ROOT_PASSWORD=123
+
+  rabbitmq:
+    image: rabbit:3.13-management
+    ports:
+      - 15672:15672    # painel administrativo do rbmq
+      - 5672:5672      # o rabbitmq de fato
