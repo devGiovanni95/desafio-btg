@@ -6,6 +6,8 @@ import com.giovanni.btg.orderms.listener.dto.OrderCreatedEvent;
 import com.giovanni.btg.orderms.repository.OrderRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class OrderService {
 
@@ -22,9 +24,13 @@ public class OrderService {
         entity.setOrderId(event.codigoPedido());
         entity.setCustomerId(event.codigoCliente());
 
-        entity.setItems(event.itens().stream()
-                .map(i -> new OrderItem(i.produto(), i.quantidade(), i.preco()))
-                .toList()
+        entity.setItems(getOrderItems(event)
         );
+    }
+
+    private static List<OrderItem> getOrderItems(OrderCreatedEvent event) {
+        return event.itens().stream()
+                .map(i -> new OrderItem(i.produto(), i.quantidade(), i.preco()))
+                .toList();
     }
 }
