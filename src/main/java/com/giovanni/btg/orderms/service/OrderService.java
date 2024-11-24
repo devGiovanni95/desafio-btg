@@ -6,6 +6,7 @@ import com.giovanni.btg.orderms.listener.dto.OrderCreatedEvent;
 import com.giovanni.btg.orderms.repository.OrderRepository;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -21,11 +22,22 @@ public class OrderService {
     public void save(OrderCreatedEvent event) {
 
         var entity = new OrderEntity();
+
         entity.setOrderId(event.codigoPedido());
         entity.setCustomerId(event.codigoCliente());
+        entity.setItems(getOrderItems(event));
+        entity.setTotal(getTotal(event));
 
-        entity.setItems(getOrderItems(event)
-        );
+        orderRepository.save(entity);
+
+    }
+
+    private BigDecimal getTotal(OrderCreatedEvent event) {
+        return event.itens()
+                .stream()
+                .map(i -> i.preco().multiply(BigDecimal.valueOf(i.quantidade())))//percorre a lista multiplicando a quantidade com o preco
+                .reduce(BigDecimal::add)//Adicionado cada map a uma acumulador
+                .orElse(BigDecimal.ZERO);//caso nao tenha retorna zero
     }
 
     private static List<OrderItem> getOrderItems(OrderCreatedEvent event) {
